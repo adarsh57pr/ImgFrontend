@@ -169,7 +169,11 @@ function ImageUpload() {
           <div className="image-gallery ">
             {similarImages.map((image, index) => (
               <div key={index} className="image-item ">
-                <img src={`https://imgbackend-u5mv.onrender.com/uploads/${image.filename}`} alt={image.filename} className='h-48 w-32'/>
+                <img
+                  src={`https://imgbackend-u5mv.onrender.com/uploads/${image.filename}`}
+                  alt={image.filename}
+                className='h-48 w-32'
+                />
                 <p>{image.filename}</p>
               </div>
             ))}
