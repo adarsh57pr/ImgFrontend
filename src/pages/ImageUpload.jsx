@@ -180,9 +180,6 @@ function ImageUpload() {
         <button onClick={() => setIsCameraActive(true)} disabled={isCameraActive || loading}>
           {isCameraActive ? 'Camera Active' : 'Open Camera'}
         </button>
-        <button onClick={capturePhoto} disabled={!isCameraActive || loading}>
-          {loading ? 'Capturing...' : 'Capture Image'}
-        </button>
         <button onClick={switchCamera} disabled={!isCameraActive || videoDevices.length <= 1}>
           Switch Camera
         </button>
@@ -193,6 +190,15 @@ function ImageUpload() {
           <video ref={videoRef} width="200" height="250" autoPlay />
           <canvas ref={canvasRef} style={{ display: 'none' }} />
           {image && <img src={image} alt="Captured" width="200" />}
+        </div>
+      )}
+
+      {/* Move Capture Button Below Video */}
+      {isCameraActive && !loading && (
+        <div className="capture-button">
+          <button onClick={capturePhoto}>
+            Capture Image
+          </button>
         </div>
       )}
 
