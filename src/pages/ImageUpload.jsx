@@ -29,30 +29,60 @@ function ImageUpload() {
   };
 
   // Start the camera
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      setCameraStream(stream);
-      videoRef.current.srcObject = stream;
-      setIsCameraActive(true);
-    } catch (err) {
-      console.error('Error accessing camera: ', err);
-      toast.error('Failed to access camera.',{position:'top-center'});
-    }
+//   const startCamera = async () => {
+//     try {
+//       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+//       setCameraStream(stream);
+//       videoRef.current.srcObject = stream;
+//       setIsCameraActive(true);
+//     } catch (err) {
+//       console.error('Error accessing camera: ', err);
+//       toast.error('Failed to access camera.',{position:'top-center'});
+//     }
+//   };
+
+//   // Capture a photo from the camera
+//   const capturePhoto = () => {
+//     if (videoRef.current && canvasRef.current) {
+//       const context = canvasRef.current.getContext('2d');
+//       canvasRef.current.width = videoRef.current.videoWidth;
+//       canvasRef.current.height = videoRef.current.videoHeight;
+//       context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+//       const imageDataUrl = canvasRef.current.toDataURL('image/jpeg');
+//       setImage(imageDataUrl);
+//       stopCamera(); // Stop camera after capturing
+//     }
+//   };
+  // Start video stream from camera
+  const startCamera = () => {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        videoRef.current.srcObject = stream;
+      })
+      .catch((err) => {
+        console.error('Error accessing camera: ', err);
+      });
   };
 
-  // Capture a photo from the camera
+  // Capture photo from video stream
   const capturePhoto = () => {
-    if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext('2d');
-      canvasRef.current.width = videoRef.current.videoWidth;
-      canvasRef.current.height = videoRef.current.videoHeight;
-      context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-      const imageDataUrl = canvasRef.current.toDataURL('image/jpeg');
-      setImage(imageDataUrl);
-      stopCamera(); // Stop camera after capturing
-    }
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+
+    // Set canvas size to match video dimensions
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Draw the current video frame on the canvas
+    const context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Get the image data URL
+    const imageUrl = canvas.toDataURL('image/jpeg');
+    setImage(imageUrl);  // Save the image for later use
+    stopCamera();
   };
+
 
   // Stop the camera
   const stopCamera = () => {
@@ -147,8 +177,9 @@ function ImageUpload() {
 
       {isCameraActive && (
         <div className="camera-view">
-          <video ref={videoRef} width="100%" autoPlay />
+          <video ref={videoRef} width="200" height="250" autoPlay />
           <canvas ref={canvasRef} style={{ display: 'none' }} />
+          {image && <img src={image} alt="Captured" width="200" />}
         </div>
       )}
 
