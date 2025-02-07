@@ -262,39 +262,27 @@ function ImageUpload() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
+    // Get available video devices (front and back cameras)
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
       setVideoDevices(videoDevices);
       if (videoDevices.length > 0) {
-        setCurrentDeviceId(videoDevices[0].deviceId);
+        setCurrentDeviceId(videoDevices[0].deviceId); // Default to the first device
       }
     });
   }, []);
 
   useEffect(() => {
+    // If the camera is active, initialize it
     if (videoRef.current && isCameraActive) {
       startCamera();
     }
-  }, [isCameraActive]);
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result;
-        setImage(base64String);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  }, [isCameraActive, currentDeviceId]); // Depend on currentDeviceId to restart camera when switched
 
   const startCamera = () => {
     const constraints = {
       video: {
         deviceId: currentDeviceId ? { exact: currentDeviceId } : undefined,
-        facingMode: currentFacingMode, // This will use the current facing mode
       }
     };
 
@@ -333,19 +321,24 @@ function ImageUpload() {
   };
 
   const switchCamera = () => {
-    const nextFacingMode = currentFacingMode === 'user' ? 'environment' : 'user'; // Switch between front and back camera
-    setCurrentFacingMode(nextFacingMode);
+    const nextDevice = videoDevices.find((device) => {
+      return device.facing === (currentFacingMode === 'user' ? 'environment' : 'user');
+    });
+    
+    if (nextDevice) {
+      setCurrentDeviceId(nextDevice.deviceId); // Switch to the new camera
+    }
 
     // Stop the current stream to avoid conflicts
     if (cameraStream) {
       cameraStream.getTracks().forEach(track => track.stop());
     }
 
-    // Restart the camera with the new facing mode
-    setIsCameraActive(true); // Reactivate the camera after a short delay
+    // Reactivate the camera after a brief delay
+    setIsCameraActive(false); // Temporarily stop the camera
     setTimeout(() => {
-      setIsCameraActive(false); // Temporarily set to false to stop the camera
-    }, 100);
+      setIsCameraActive(true); // Restart the camera with the new device ID
+    }, 500);
   };
 
   const handleSearchSubmit = async (e) => {
@@ -379,7 +372,6 @@ function ImageUpload() {
     }
   };
 
-  // Handle image upload to server
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
 
@@ -392,10 +384,9 @@ function ImageUpload() {
     setMessage('');
 
     try {
-      const response = await axios.post('https://imgbackend-u5mv.onrender.com/upload',
-        { imageBase64: image },
-        { headers: { 'Content-Type': 'application/json' } }
-      );
+      const response = await axios.post('https://imgbackend-u5mv.onrender.com/upload', { imageBase64: image }, {
+        headers: { 'Content-Type': 'application/json' },
+      });
 
       if (response.data.message) {
         toast.success(response.data.message, { position: 'top-center' });
@@ -414,7 +405,7 @@ function ImageUpload() {
 
       <div>
         <form onSubmit={handleUploadSubmit}>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
+          <input type="file" accept="image/*" />
           <button type="submit" disabled={loading}>
             {loading ? 'Uploading...' : 'Upload Image to Database'}
           </button>
@@ -432,7 +423,7 @@ function ImageUpload() {
 
       {isCameraActive && (
         <div className="camera-view">
-          <video ref={videoRef} className=' w-80 h-80 rounded-md' autoPlay />
+          <video ref={videoRef} className='w-80 h-80 rounded-md' autoPlay />
           <canvas ref={canvasRef} style={{ display: 'none' }} />
         </div>
       )}
