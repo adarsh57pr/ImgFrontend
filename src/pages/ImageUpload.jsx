@@ -256,6 +256,7 @@ function ImageUpload() {
   const [cameraStream, setCameraStream] = useState(null);
   const [currentDeviceId, setCurrentDeviceId] = useState('');
   const [videoDevices, setVideoDevices] = useState([]);
+  const [currentFacingMode, setCurrentFacingMode] = useState('user'); // 'user' is front, 'environment' is back
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -295,7 +296,10 @@ function ImageUpload() {
   // Start video stream from camera
   const startCamera = () => {
     const constraints = {
-      video: { deviceId: currentDeviceId ? { exact: currentDeviceId } : undefined }
+      video: {
+        deviceId: currentDeviceId ? { exact: currentDeviceId } : undefined,
+        facingMode: currentFacingMode // Set the facingMode (user for front, environment for back)
+      }
     };
 
     navigator.mediaDevices.getUserMedia(constraints)
@@ -341,20 +345,12 @@ function ImageUpload() {
     // Stop current camera stream
     stopCamera();
 
-    // Try to find the next camera (front or back)
-    const nextDevice = videoDevices.find(device => {
-      // If the device is not the current one and has a facingMode (either 'user' for front or 'environment' for back)
-      return device.deviceId !== currentDeviceId && (
-        device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('front')
-      );
-    });
+    // Toggle the facingMode between 'user' (front camera) and 'environment' (back camera)
+    const nextFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+    setCurrentFacingMode(nextFacingMode);
 
-    if (nextDevice) {
-      setCurrentDeviceId(nextDevice.deviceId); // Set the new camera device ID
-      setIsCameraActive(true); // Restart the camera with the new device ID
-    } else {
-      toast.warning('No other camera found.', { position: 'top-center' });
-    }
+    // Restart the camera with the new facing mode
+    setIsCameraActive(true);
   };
 
   // Handle search similar images
@@ -435,7 +431,7 @@ function ImageUpload() {
         <button onClick={() => setIsCameraActive(true)} disabled={isCameraActive || loading}>
           {isCameraActive ? 'Camera Active' : 'Open Camera'}
         </button>
-        <button onClick={switchCamera} disabled={!isCameraActive || videoDevices.length <= 1}>
+        <button onClick={switchCamera} disabled={!isCameraActive}>
           Switch Camera
         </button>
       </div>
