@@ -256,7 +256,7 @@ function ImageUpload() {
   const [cameraStream, setCameraStream] = useState(null);
   const [currentDeviceId, setCurrentDeviceId] = useState('');
   const [videoDevices, setVideoDevices] = useState([]);
-  const [currentFacingMode, setCurrentFacingMode] = useState('environment');
+  const [currentFacingMode, setCurrentFacingMode] = useState('user');
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -334,7 +334,7 @@ function ImageUpload() {
 
   const switchCamera = () => {
     // stopCamera();
-    const nextFacingMode = currentFacingMode !== 'user' ? 'user' : 'environment';
+    const nextFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
     setCurrentFacingMode(nextFacingMode);
     setIsCameraActive(true);
   };
