@@ -321,8 +321,8 @@ function ImageUpload() {
 
     const imageUrl = canvas.toDataURL('image/jpeg');
     setImage(imageUrl);
-    setIsCameraActive(false)
     stopCamera();
+    setIsCameraActive(false)
   };
 
   const stopCamera = () => {
@@ -333,11 +333,9 @@ function ImageUpload() {
   };
 
   const switchCamera = () => {
-    stopCamera();
-
+    // stopCamera();
     const nextFacingMode = currentFacingMode !== 'user' ? 'user' : 'environment';
     setCurrentFacingMode(nextFacingMode);
-
     setIsCameraActive(true);
   };
 
@@ -430,7 +428,6 @@ function ImageUpload() {
         </div>
       )}
 
-      {/* Move Capture Button Below Video */}
       {isCameraActive && !loading && (
         <div className="capture-button">
           <button onClick={capturePhoto}>
