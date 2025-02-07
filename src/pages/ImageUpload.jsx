@@ -438,7 +438,7 @@ function ImageUpload() {
 
       {isCameraActive && (
         <div className="camera-view">
-          <video ref={videoRef} width="100" height="150" autoPlay />
+          <video ref={videoRef} className=' w-60 h-80 rounded-md' autoPlay />
           <canvas ref={canvasRef} style={{ display: 'none' }} />
         </div>
       )}
