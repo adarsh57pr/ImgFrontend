@@ -32,7 +32,7 @@ function ImageUpload() {
     if (videoRef.current && isCameraActive) {
       startCamera();
     }
-  }, [isCameraActive]);
+  },[isCameraActive]);
 
   // Handle file input change (image selection from file picker)
   const handleFileChange = (e) => {
@@ -187,9 +187,9 @@ function ImageUpload() {
 
       {isCameraActive && (
         <div className="camera-view">
-          <video ref={videoRef} width="200" height="250" autoPlay />
+          <video ref={videoRef} width="100" height="150" autoPlay />
           <canvas ref={canvasRef} style={{ display: 'none' }} />
-          {image && <img src={image} alt="Captured" width="200" />}
+          
         </div>
       )}
 
@@ -200,8 +200,9 @@ function ImageUpload() {
             Capture Image
           </button>
         </div>
+        
       )}
-
+{image && <img src={image} alt="Captured" className='w-20 h-32 mt-2 m-auto' />}
       {message && <p>{message}</p>}
 
       <hr />
