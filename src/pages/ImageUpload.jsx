@@ -245,7 +245,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import '../App.css'; // import the CSS file
+import '../App.css';
 
 function ImageUpload() {
   const [image, setImage] = useState(null);
@@ -256,30 +256,27 @@ function ImageUpload() {
   const [cameraStream, setCameraStream] = useState(null);
   const [currentDeviceId, setCurrentDeviceId] = useState('');
   const [videoDevices, setVideoDevices] = useState([]);
-  const [currentFacingMode, setCurrentFacingMode] = useState('user'); // 'user' is front, 'environment' is back
+  const [currentFacingMode, setCurrentFacingMode] = useState('environment');
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
-  // Get list of available video devices
   useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
       setVideoDevices(videoDevices);
       if (videoDevices.length > 0) {
-        setCurrentDeviceId(videoDevices[0].deviceId); // Default to the first available camera
+        setCurrentDeviceId(videoDevices[0].deviceId);
       }
     });
   }, []);
 
-  // Ensure video element is ready before starting the camera
   useEffect(() => {
     if (videoRef.current && isCameraActive) {
       startCamera();
     }
   },[isCameraActive]);
 
-  // Handle file input change (image selection from file picker)
   const handleFileChange = (e) => {
     const file = e.target.files[0];
 
@@ -293,19 +290,18 @@ function ImageUpload() {
     }
   };
 
-  // Start video stream from camera
   const startCamera = () => {
     const constraints = {
       video: {
         deviceId: currentDeviceId ? { exact: currentDeviceId } : undefined,
-        facingMode: currentFacingMode // Set the facingMode (user for front, environment for back)
+        facingMode: currentFacingMode 
       }
     };
 
     navigator.mediaDevices.getUserMedia(constraints)
       .then((stream) => {
         setCameraStream(stream);
-        videoRef.current.srcObject = stream;  // Set stream to video element
+        videoRef.current.srcObject = stream;
       })
       .catch((err) => {
         console.error('Error accessing camera: ', err);
@@ -313,47 +309,38 @@ function ImageUpload() {
       });
   };
 
-  // Capture photo from video stream
   const capturePhoto = () => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
 
-    // Set canvas size to match video dimensions
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    // Draw the current video frame on the canvas
     const context = canvas.getContext('2d');
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Get the image data URL
     const imageUrl = canvas.toDataURL('image/jpeg');
-    setImage(imageUrl);  // Save the image for later use
+    setImage(imageUrl);
+    setIsCameraActive(false)
     stopCamera();
   };
 
-  // Stop the camera
   const stopCamera = () => {
     if (cameraStream) {
       cameraStream.getTracks().forEach(track => track.stop());
-      setIsCameraActive(false);
+      setIsCameraActive(true);
     }
   };
 
-  // Switch to the other camera (front/back)
   const switchCamera = () => {
-    // Stop current camera stream
     stopCamera();
 
-    // Toggle the facingMode between 'user' (front camera) and 'environment' (back camera)
-    const nextFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+    const nextFacingMode = currentFacingMode !== 'user' ? 'user' : 'environment';
     setCurrentFacingMode(nextFacingMode);
 
-    // Restart the camera with the new facing mode
     setIsCameraActive(true);
   };
 
-  // Handle search similar images
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
 
@@ -438,7 +425,7 @@ function ImageUpload() {
 
       {isCameraActive && (
         <div className="camera-view">
-          <video ref={videoRef} className=' w-60 h-80 rounded-md' autoPlay />
+          <video ref={videoRef} className=' w-80 h-80 rounded-md' autoPlay />
           <canvas ref={canvasRef} style={{ display: 'none' }} />
         </div>
       )}
