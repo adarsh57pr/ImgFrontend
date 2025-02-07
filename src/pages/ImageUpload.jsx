@@ -342,9 +342,9 @@ function ImageUpload() {
     }
 
     // Restart the camera with the new facing mode
-    setIsCameraActive(false); // Temporarily set to false to stop the camera
+    setIsCameraActive(true); // Reactivate the camera after a short delay
     setTimeout(() => {
-      setIsCameraActive(true); // Reactivate the camera after a short delay
+      setIsCameraActive(false); // Temporarily set to false to stop the camera
     }, 100);
   };
 
