@@ -256,7 +256,7 @@ function ImageUpload() {
   const [cameraStream, setCameraStream] = useState(null);
   const [currentDeviceId, setCurrentDeviceId] = useState('');
   const [videoDevices, setVideoDevices] = useState([]);
-  const [currentFacingMode, setCurrentFacingMode] = useState('user');
+  const [currentFacingMode, setCurrentFacingMode] = useState('user'); // 'user' = front camera, 'environment' = back camera
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -275,7 +275,7 @@ function ImageUpload() {
     if (videoRef.current && isCameraActive) {
       startCamera();
     }
-  },[isCameraActive]);
+  }, [isCameraActive]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -294,7 +294,7 @@ function ImageUpload() {
     const constraints = {
       video: {
         deviceId: currentDeviceId ? { exact: currentDeviceId } : undefined,
-        facingMode: currentFacingMode 
+        facingMode: currentFacingMode, // This will use the current facing mode
       }
     };
 
@@ -322,21 +322,30 @@ function ImageUpload() {
     const imageUrl = canvas.toDataURL('image/jpeg');
     setImage(imageUrl);
     stopCamera();
-    setIsCameraActive(false)
+    setIsCameraActive(false);
   };
 
   const stopCamera = () => {
     if (cameraStream) {
       cameraStream.getTracks().forEach(track => track.stop());
-      setIsCameraActive(true);
+      setIsCameraActive(false); // Make sure to stop camera and reset status
     }
   };
 
   const switchCamera = () => {
-    // stopCamera();
-    const nextFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+    const nextFacingMode = currentFacingMode === 'user' ? 'environment' : 'user'; // Switch between front and back camera
     setCurrentFacingMode(nextFacingMode);
-    setIsCameraActive(true);
+
+    // Stop the current stream to avoid conflicts
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+    }
+
+    // Restart the camera with the new facing mode
+    setIsCameraActive(false); // Temporarily set to false to stop the camera
+    setTimeout(() => {
+      setIsCameraActive(true); // Reactivate the camera after a short delay
+    }, 100);
   };
 
   const handleSearchSubmit = async (e) => {
