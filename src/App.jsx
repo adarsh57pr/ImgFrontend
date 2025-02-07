@@ -11,10 +11,10 @@ function App() {
         <Routes>
           <Route path="/" element={<ImageUpload />} />
           <Route path="/camera" element={<CameraToggle />} />
+          <ToastContainer />
         </Routes>
       </BrowserRouter>
-      <ImageUpload />
-      <ToastContainer />
+      
     </div>
   );
 }
