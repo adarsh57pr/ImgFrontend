@@ -4,6 +4,7 @@ import './App.css';
 import ImageUpload from './pages/ImageUpload';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import CameraToggle from './pages/CameraToggle';
+
 function App() {
   return (
     <div className="App">
