@@ -3,7 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import './App.css';
 import ImageUpload from './pages/ImageUpload';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import CaptureImage from './pages/CaptureImage';
+// import CaptureImage from './pages/CaptureImage';
 // import CameraToggle from './pages/CameraToggle';
 // import Face from './pages/Face';
 
